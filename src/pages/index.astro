@@ -1,0 +1,46 @@
+---
+import Layout from '../layouts/Layout.astro';
+---
+
+<Layout title="Your Name - Portfolio">
+  <section class="space-y-6">
+    <div class="text-center space-y-4">
+      <h1 class="text-4xl font-bold">Hi, I'm Your Name</h1>
+      <p class="text-xl text-gray-600 dark:text-gray-400">
+        Full Stack Developer & Technical Writer
+      </p>
+    </div>
+
+    <div class="prose dark:prose-invert max-w-none">
+      <p>
+        Welcome to my corner of the web! I'm a passionate developer focused on creating
+        elegant solutions to complex problems. With expertise in [Your Technologies],
+        I help businesses build scalable and maintainable applications.
+      </p>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-12">
+      <div class="p-6 border border-gray-200 dark:border-gray-700 rounded-lg">
+        <h2 class="text-2xl font-semibold mb-4">Skills</h2>
+        <ul class="space-y-2">
+          <li>Frontend Development</li>
+          <li>Backend Development</li>
+          <li>Cloud Architecture</li>
+          <li>Technical Writing</li>
+        </ul>
+      </div>
+
+      <div class="p-6 border border-gray-200 dark:border-gray-700 rounded-lg">
+        <h2 class="text-2xl font-semibold mb-4">Featured Projects</h2>
+        <ul class="space-y-2">
+          <li>
+            <a href="#" class="text-primary hover:underline">Project 1</a>
+          </li>
+          <li>
+            <a href="#" class="text-primary hover:underline">Project 2</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </section>
+</Layout>
