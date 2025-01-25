@@ -1,0 +1,313 @@
+---
+title: 'Building a Parser: Numbers | Strings'
+description: 'Learn how to implement numeric and string literal parsing in a recursive descent parser, including tokenization and AST construction.'
+pubDate: 2025-01-27
+---
+
+In our [previous post](https://isagi.in/blog/tokenizer-parser/), we laid the groundwork with a basic parser and tokenizer. Now, let's dive deeper into the architecture of recursive descent parsing.
+
+The parser we're building follows a two-stage approach: first breaking input into tokens through tokenization, then constructing an Abstract Syntax Tree (AST) from those tokens during parsing. Recursive descent parsing is particularly elegant because it maps grammar rules directly to parser methods, breaking down complex expressions into manageable pieces - like solving a puzzle systematically.
+
+Today, we'll extend this architecture to handle both numeric and string literals, making our parser more practical and powerful.
+
+## The Tokenizer and Token Types
+
+Our tokenizer now handles two main token types:
+
+- **NUMBER**: Sequences of digits
+- **STRING**: Characters enclosed in double quotes
+
+### Enhanced Tokenizer Implementation
+
+Let's start by upgrading our tokenizer to handle both numbers and strings. Our tokenizer needs to recognize and extract these basic types from the input stream.
+
+```javascript
+class Tokenizer {
+  init(string) {
+    this._string = string;
+    this._cursor = 0;
+  }
+
+  isEOF() {
+    return this._cursor >= this._string.length;
+  }
+
+  hasMoreTokens() {
+    return this._cursor < this._string.length;
+  }
+
+  getNextToken() {
+    if (!this.hasMoreTokens()) {
+      return null;
+    }
+
+    let char = this._string[this._cursor];
+
+    // Skip any whitespace
+    while (char === ' ' || char === '\t' || char === '\n') {
+      this._cursor++;
+      if (this.isEOF()) return null;
+      char = this._string[this._cursor];
+    }
+
+    // Numbers:
+    if (!Number.isNaN(Number(char))) {
+      let number = '';
+      while (!Number.isNaN(Number(this._string[this._cursor])) && !this.isEOF()) {
+        number += this._string[this._cursor++];
+      }
+      return {
+        type: 'NUMBER',
+        value: number,
+      };
+    }
+
+    // Strings:
+    if (char === '"') {
+      let str = '';
+      this._cursor++; // Skip opening quote
+      while (this._string[this._cursor] !== '"' && !this.isEOF()) {
+        str += this._string[this._cursor++];
+      }
+      this._cursor++; // Skip closing quote
+      return {
+        type: 'STRING',
+        value: str,
+      };
+    }
+
+    // Handle unexpected characters
+    throw new SyntaxError(`Unexpected token: "${char}"`);
+  }
+}
+```
+
+## Parser Grammar Rules
+
+Our parser's grammar has evolved to handle both types of literals:
+
+```
+Program
+  : Literal
+  ;
+
+Literal
+  : NumericLiteral
+  | StringLiteral
+  ;
+
+NumericLiteral
+  : NUMBER
+  ;
+
+StringLiteral
+  : STRING
+  ;
+```
+
+## Implementing the Parser
+
+Let's implement these grammar rules in our parser:
+
+```javascript
+class Parser {
+  constructor() {
+    this._string = '';
+    this._tokenizer = new Tokenizer();
+  }
+
+  parse(string) {
+    this._string = string;
+    this._tokenizer.init(string);
+    
+    // Prime the tokenizer to obtain the first token
+    this._lookahead = this._tokenizer.getNextToken();
+    
+    return this.Program();
+  }
+
+  /**
+   * Program
+   *   : Literal
+   *   ;
+   */
+  Program() {
+    return {
+      type: 'Program',
+      body: this.Literal(),
+    };
+  }
+
+  /**
+   * Literal
+   *   : NumericLiteral
+   *   | StringLiteral
+   *   ;
+   */
+  Literal() {
+    switch (this._lookahead.type) {
+      case 'NUMBER':
+        return this.NumericLiteral();
+      case 'STRING':
+        return this.StringLiteral();
+      default:
+        throw new SyntaxError('Literal: unexpected literal production');
+    }
+  }
+
+  /**
+   * NumericLiteral
+   *   : NUMBER
+   *   ;
+   */
+  NumericLiteral() {
+    const token = this._eat('NUMBER');
+    return {
+      type: 'NumericLiteral',
+      value: Number(token.value),
+    };
+  }
+
+  /**
+   * StringLiteral
+   *   : STRING
+   *   ;
+   */
+  StringLiteral() {
+    const token = this._eat('STRING');
+    return {
+      type: 'StringLiteral',
+      value: token.value,
+    };
+  }
+
+  _eat(tokenType) {
+    const token = this._lookahead;
+
+    if (token == null) {
+      throw new SyntaxError(
+        `Unexpected end of input, expected: "${tokenType}"`
+      );
+    }
+
+    if (token.type !== tokenType) {
+      throw new SyntaxError(
+        `Unexpected token: "${token.type}", expected: "${tokenType}"`
+      );
+    }
+
+    // Advance to next token
+    this._lookahead = this._tokenizer.getNextToken();
+
+    return token;
+  }
+}
+```
+
+## Understanding the Implementation
+
+### The Lookahead Token
+
+Our parser uses a **lookahead token** to predict which production to use. This makes it an **LL(1)** parser, meaning it needs to look ahead exactly one token to make parsing decisions.
+
+```javascript
+// Prime the tokenizer to obtain the first token
+this._lookahead = this._tokenizer.getNextToken();
+```
+
+### Token Consumption
+
+The `_eat` method is crucial for token consumption:
+
+- **Validates** the current token type
+- **Advances** to the next token
+- **Returns** the consumed token
+
+```javascript
+_eat(tokenType) {
+  const token = this._lookahead;
+  
+  if (token == null) {
+    throw new SyntaxError(`Unexpected end of input, expected: "${tokenType}"`);
+  }
+
+  if (token.type !== tokenType) {
+    throw new SyntaxError(
+      `Unexpected token: "${token.type}", expected: "${tokenType}"`
+    );
+  }
+
+  this._lookahead = this._tokenizer.getNextToken();
+  return token;
+}
+```
+
+## Testing Our Parser
+
+Let's test our parser with various inputs:
+
+```javascript
+const parser = new Parser();
+
+// Testing numeric literals
+console.log(parser.parse('42'));
+// Output:
+// {
+//   type: 'Program',
+//   body: {
+//     type: 'NumericLiteral',
+//     value: 42
+//   }
+// }
+
+// Testing string literals
+console.log(parser.parse('"Hello, world!"'));
+// Output:
+// {
+//   type: 'Program',
+//   body: {
+//     type: 'StringLiteral',
+//     value: 'Hello, world!'
+//   }
+// }
+```
+
+## Error Handling
+
+Our parser includes robust error handling for common cases:
+
+- **Unexpected end of input**
+- **Unexpected token types**
+- **Invalid literal productions**
+
+```javascript
+// This will throw: Unexpected token: "a", expected: "NUMBER"
+parser.parse('abc');
+
+// This will throw: Unexpected end of input, expected: "STRING"
+parser.parse('"unclosed string');
+```
+
+## Next Steps
+
+While our parser can now handle basic numeric and string literals, there are several improvements we could make:
+
+- Support for single quotes in strings
+- Handling of escape sequences in strings
+- Support for floating-point numbers
+- Adding support for hexadecimal and octal numbers
+
+In our next post, we'll explore adding support for mathematical expressions and operator precedence.
+
+### Exercise for Readers
+
+Try extending the parser to support single-quoted strings. Here's a hint:
+
+```javascript
+// In the tokenizer's getNextToken method:
+if (char === '"' || char === "'") {
+  // Handle both quote types
+}
+```
+
+
