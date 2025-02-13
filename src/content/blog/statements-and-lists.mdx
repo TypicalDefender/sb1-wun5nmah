@@ -1,0 +1,301 @@
+---
+title: 'Building a Parser: Statements & Statement Lists'
+description: 'Learn how to implement multiple statements, expression statements, and test-driven development for parser construction.'
+pubDate: 2025-02-15
+---
+
+In our [previous post](https://isagi.in/blog/state-machines-regex/), we implemented a robust tokenizer using state machines and regular expressions. Now, let's extend our parser to handle multiple statements - a crucial feature of any programming language.
+
+## From Single Expressions to Statement Lists
+
+Real programming languages rarely consist of single expressions. Instead, they typically contain multiple statements separated by delimiters (usually semicolons). Let's evolve our parser to handle this structure.
+
+### Grammar Definition
+
+Here's our updated grammar to support multiple statements:
+
+```bnf
+Program
+  : StatementList
+  ;
+
+StatementList
+  : Statement
+  | Statement StatementList
+  ;
+
+Statement
+  : ExpressionStatement
+  ;
+
+ExpressionStatement
+  : Expression ";"
+  ;
+
+Expression
+  : Literal
+  ;
+```
+
+## Understanding Left Recursion
+
+Our initial grammar for `StatementList` might be tempting to write as:
+
+```bnf
+StatementList
+  : Statement
+  | StatementList Statement
+  ;
+```
+
+However, this creates a left recursion problem. LL parsers (including recursive descent parsers) cannot handle left recursion because it leads to infinite recursion. Instead, we need to either:
+
+1. Refactor to right recursion
+2. Manually expand the recursion using loops
+
+We'll take the second approach for clarity and efficiency.
+
+## Implementation
+
+Let's implement our new grammar rules:
+
+```javascript
+class Parser {
+  /**
+   * Program
+   *   : StatementList
+   *   ;
+   */
+  Program() {
+    return {
+      type: 'Program',
+      body: this.StatementList(),
+    };
+  }
+
+  /**
+   * StatementList
+   *   : Statement
+   *   | Statement StatementList
+   *   ;
+   */
+  StatementList() {
+    const statementList = [this.Statement()];
+
+    while (this._lookahead !== null) {
+      statementList.push(this.Statement());
+    }
+
+    return statementList;
+  }
+
+  /**
+   * Statement
+   *   : ExpressionStatement
+   *   ;
+   */
+  Statement() {
+    return this.ExpressionStatement();
+  }
+
+  /**
+   * ExpressionStatement
+   *   : Expression ";"
+   *   ;
+   */
+  ExpressionStatement() {
+    const expression = this.Expression();
+    this._eat(';');
+    
+    return {
+      type: 'ExpressionStatement',
+      expression,
+    };
+  }
+
+  /**
+   * Expression
+   *   : Literal
+   *   ;
+   */
+  Expression() {
+    return this.Literal();
+  }
+
+  /**
+   * Literal
+   *   : NumericLiteral
+   *   | StringLiteral
+   *   ;
+   */
+  Literal() {
+    switch (this._lookahead.type) {
+      case 'NUMBER':
+        return this.NumericLiteral();
+      case 'STRING':
+        return this.StringLiteral();
+      default:
+        throw new SyntaxError(`Literal: unexpected literal production`);
+    }
+  }
+}
+```
+
+## Testing Our Implementation
+
+Let's write some tests
+
+```javascript
+describe('Parser: Statement Lists', () => {
+  let parser;
+
+  beforeEach(() => {
+    parser = new Parser();
+  });
+
+  describe('Single Statements', () => {
+    test('parses numeric literal statement', () => {
+      const ast = parser.parse('42;');
+      expect(ast).toEqual({
+        type: 'Program',
+        body: [{
+          type: 'ExpressionStatement',
+          expression: {
+            type: 'NumericLiteral',
+            value: 42
+          }
+        }]
+      });
+    });
+
+    test('parses string literal statement', () => {
+      const ast = parser.parse('"hello";');
+      expect(ast).toEqual({
+        type: 'Program',
+        body: [{
+          type: 'ExpressionStatement',
+          expression: {
+            type: 'StringLiteral',
+            value: 'hello'
+          }
+        }]
+      });
+    });
+  });
+
+  describe('Multiple Statements', () => {
+    test('parses multiple statements', () => {
+      const ast = parser.parse(`
+        42;
+        "hello";
+        3.14;
+      `);
+      
+      expect(ast).toEqual({
+        type: 'Program',
+        body: [
+          {
+            type: 'ExpressionStatement',
+            expression: { type: 'NumericLiteral', value: 42 }
+          },
+          {
+            type: 'ExpressionStatement',
+            expression: { type: 'StringLiteral', value: 'hello' }
+          },
+          {
+            type: 'ExpressionStatement',
+            expression: { type: 'NumericLiteral', value: 3.14 }
+          }
+        ]
+      });
+    });
+  });
+
+  describe('Error Handling', () => {
+    test('throws on missing semicolon', () => {
+      expect(() => parser.parse('42')).toThrow('Expected ";"');
+    });
+
+    test('throws on invalid literal', () => {
+      expect(() => parser.parse('invalid;')).toThrow('Unexpected token');
+    });
+
+    test('throws on empty input', () => {
+      expect(() => parser.parse('')).toThrow('Unexpected end of input');
+    });
+  });
+});
+```
+
+### Common Edge Cases to Consider
+
+When implementing statement lists, watch out for these common pitfalls:
+
+1. **Whitespace Handling**: Your parser should handle various whitespace patterns:
+```javascript
+// All these should parse the same way:
+'42;"hello";'
+'42; "hello";'
+'42;\n"hello";'
+```
+
+2. **Empty Statements**: Decide how to handle consecutive semicolons:
+```javascript
+// Should this be valid?
+'42;;'
+```
+
+3. **Comments Between Statements**: If your language supports comments:
+```javascript
+42; // first number
+"hello"; /* greeting */
+```
+
+## Error Recovery
+
+For a production-ready parser, consider implementing error recovery. Here's a basic example:
+
+```javascript
+StatementList() {
+  const statements = [];
+  
+  while (this._lookahead !== null) {
+    try {
+      statements.push(this.Statement());
+    } catch (error) {
+      console.error(`Error parsing statement: ${error.message}`);
+      this._synchronize(); // Skip to next statement
+    }
+  }
+  
+  return statements;
+}
+
+_synchronize() {
+  while (this._lookahead !== null && this._lookahead.type !== ';') {
+    this._eat(this._lookahead.type);
+  }
+  if (this._lookahead !== null) {
+    this._eat(';');
+  }
+}
+```
+
+### Exercise for Readers
+
+Try extending the parser to support these features:
+
+1. Empty statements (consecutive semicolons)
+2. Single-line comments using `//`
+3. Multi-line comments using `/* */`
+
+Here's a starting point for comment support:
+
+```javascript
+_skipComment() {
+  if (this._lookahead.type === 'COMMENT') {
+    this._eat('COMMENT');
+  }
+}
+```
+
