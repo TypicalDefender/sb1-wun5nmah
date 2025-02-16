@@ -41,6 +41,117 @@ EmptyStatement
   ;
 ```
 
+## Deep Dive: Block Statements and Scope
+
+### Why Blocks Matter
+
+Block statements serve multiple purposes:
+
+1. **Scope Isolation**: They create a new lexical scope, preventing variable name collisions and controlling visibility
+2. **Memory Management**: Help with garbage collection by clearly defining variable lifetimes
+3. **Code Organization**: Provide visual and logical grouping of related statements
+4. **Control Flow**: Essential for defining boundaries in if/else, loops, and functions
+
+### The Anatomy of Block Processing
+
+When our parser encounters a block statement, several important things happen:
+
+1. **Token Recognition**: The parser identifies the opening `{`
+2. **Scope Creation**: (In interpreters) A new scope object/environment would be created
+3. **Statement Collection**: All statements until the matching `}` are parsed
+4. **Scope Resolution**: (In interpreters) The scope is popped when leaving the block
+
+Here's a detailed look at the process:
+
+```javascript
+/**
+ * BlockStatement handles both the syntactic structure and prepares
+ * for semantic analysis. The body array maintains statement order,
+ * which is crucial for proper execution flow.
+ */
+BlockStatement() {
+  // 1. Enter new scope (for interpreters)
+  // this._symbolTable.enterScope();
+
+  this._eat('{');
+  
+  // 2. Process all statements in the block
+  const body = this._lookahead.type !== '}' 
+    ? this.StatementList('}')
+    : [];
+    
+  this._eat('}');
+  
+  // 3. Exit scope (for interpreters)
+  // this._symbolTable.exitScope();
+
+  return {
+    type: 'BlockStatement',
+    body,
+  };
+}
+```
+
+### Understanding the AST Structure
+
+The AST structure for blocks is hierarchical, reflecting the nested nature of scopes. Let's examine a complex example:
+
+```javascript
+{
+  let x = 10;
+  {
+    let y = 20;
+    {
+      let z = 30;
+    }
+  }
+}
+```
+
+This produces an AST like:
+
+```javascript
+{
+  type: 'BlockStatement',
+  body: [
+    {
+      type: 'VariableDeclaration',
+      declarations: [{
+        type: 'VariableDeclarator',
+        id: { type: 'Identifier', name: 'x' },
+        init: { type: 'NumericLiteral', value: 10 }
+      }]
+    },
+    {
+      type: 'BlockStatement',
+      body: [
+        {
+          type: 'VariableDeclaration',
+          declarations: [{
+            type: 'VariableDeclarator',
+            id: { type: 'Identifier', name: 'y' },
+            init: { type: 'NumericLiteral', value: 20 }
+          }]
+        },
+        {
+          type: 'BlockStatement',
+          body: [
+            {
+              type: 'VariableDeclaration',
+              declarations: [{
+                type: 'VariableDeclarator',
+                id: { type: 'Identifier', name: 'z' },
+                init: { type: 'NumericLiteral', value: 30 }
+              }]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
+```
+
 ## Implementation
 
 Here's how we implement block statements:
@@ -372,6 +483,84 @@ S-expression format:
   ]
 ]
 ```
+
+### Advanced Factory Pattern Implementation
+
+Let's dive deeper into how the Factory pattern can be implemented with more sophisticated features:
+
+```javascript
+class ASTNodeFactory {
+  constructor(format = 'default', options = {}) {
+    this.format = format;
+    this.options = {
+      includeLocation: false,
+      preserveComments: false,
+      ...options
+    };
+  }
+
+  createNode(type, properties) {
+    // Add source location if enabled
+    if (this.options.includeLocation) {
+      properties.loc = this.getCurrentLocation();
+    }
+
+    switch (this.format) {
+      case 'default':
+        return {
+          type,
+          ...properties
+        };
+
+      case 'sexpr':
+        return this.createSExpression(type, properties);
+
+      case 'minimal':
+        return this.createMinimalNode(type, properties);
+
+      default:
+        throw new Error(`Unsupported AST format: ${this.format}`);
+    }
+  }
+
+  createSExpression(type, { body, expression, value }) {
+    switch (type) {
+      case 'Program':
+      case 'BlockStatement':
+        return ['begin', ...(body || [])];
+      case 'ExpressionStatement':
+        return expression;
+      case 'NumericLiteral':
+        return value;
+      // ... other cases
+    }
+  }
+
+  createMinimalNode(type, properties) {
+    // Strip out unnecessary properties for a minimal AST
+    const essentialProps = this.getEssentialProperties(type);
+    return Object.fromEntries(
+      Object.entries(properties)
+        .filter(([key]) => essentialProps.includes(key))
+    );
+  }
+
+  getCurrentLocation() {
+    // Implementation for tracking source locations
+    return {
+      start: { line: 0, column: 0 },
+      end: { line: 0, column: 0 }
+    };
+  }
+}
+```
+
+This enhanced factory implementation provides:
+
+1. **Configurable Output**: Different AST formats from the same parser
+2. **Source Location Tracking**: Optional inclusion of source positions
+3. **Minimal AST Option**: Stripped-down AST for specific use cases
+4. **Comment Preservation**: Optional retention of comments in the AST
 
 ### Exercise for Readers
 
