@@ -17,7 +17,7 @@ import BackgroundAnimation from '../components/BackgroundAnimation';
     client:load
   />
 
-  <AnimatedSection delay={0.2} className="mt-16" client:load>
+  <AnimatedSection delay={0.1} className="mt-16" threshold={0.1} client:visible>
     <div class="prose dark:prose-invert max-w-none">
       <h2 id="about" class="text-3xl font-bold mb-6">About Me</h2>
       <p>
@@ -32,23 +32,23 @@ import BackgroundAnimation from '../components/BackgroundAnimation';
     </div>
   </AnimatedSection>
 
-  <AnimatedSection delay={0.3} className="mt-16" client:load>
+  <AnimatedSection delay={0.1} className="mt-16" threshold={0.1} client:visible>
     <h2 class="text-3xl font-bold mb-8">My Skills</h2>
     <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
       <div>
-        <SkillBar skill="AWS Cloud Services" percentage={95} delay={0.1} client:load />
-        <SkillBar skill="TypeScript" percentage={90} delay={0.2} client:load />
-        <SkillBar skill="Go" percentage={85} delay={0.3} client:load />
+        <SkillBar skill="AWS Cloud Services" percentage={95} delay={0.1} client:visible />
+        <SkillBar skill="TypeScript" percentage={90} delay={0.2} client:visible />
+        <SkillBar skill="Go" percentage={85} delay={0.3} client:visible />
       </div>
       <div>
-        <SkillBar skill="Message Broker Systems" percentage={88} delay={0.4} client:load />
-        <SkillBar skill="Database Management" percentage={92} delay={0.5} client:load />
-        <SkillBar skill="Workflow Orchestration" percentage={85} delay={0.6} client:load />
+        <SkillBar skill="Message Broker Systems" percentage={88} delay={0.1} client:visible />
+        <SkillBar skill="Database Management" percentage={92} delay={0.2} client:visible />
+        <SkillBar skill="Workflow Orchestration" percentage={85} delay={0.3} client:visible />
       </div>
     </div>
   </AnimatedSection>
 
-  <AnimatedSection delay={0.4} className="mt-16" client:load>
+  <AnimatedSection delay={0.1} className="mt-16" threshold={0.1} client:visible>
     <h2 class="text-3xl font-bold mb-8">Featured Projects</h2>
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
       <AnimatedCard
@@ -56,21 +56,21 @@ import BackgroundAnimation from '../components/BackgroundAnimation';
         description="How we built our own video streaming platform at Vedantu"
         link="https://tech.vedantu.com/works/inhouse-video-streaming/"
         delay={0.1}
-        client:load
+        client:visible
       />
       <AnimatedCard
         title="VQuiz Product Backend"
         description="Built the backend for Vedantu's quiz platform from scratch"
         link="https://www.vedantu.com/vquiz"
         delay={0.2}
-        client:load
+        client:visible
       />
       <AnimatedCard
         title="EntangleDB"
         description="An open-source database project"
         link="https://github.com/TypicalDefender/entangleDB"
         delay={0.3}
-        client:load
+        client:visible
       />
     </div>
   </AnimatedSection>

@@ -5,7 +5,7 @@ import AnimatedSection from '../components/AnimatedSection';
 
 <Layout title="About Me">
   <article class="prose dark:prose-invert max-w-none">
-    <AnimatedSection client:load>
+    <AnimatedSection animateOnLoad={true} client:load>
       <h1>About Me</h1>
 
       <div class="flex flex-col md:flex-row md:items-center gap-6 mb-8 not-prose">
@@ -50,7 +50,7 @@ import AnimatedSection from '../components/AnimatedSection';
       </div>
     </AnimatedSection>
 
-    <AnimatedSection delay={0.2} client:load>
+    <AnimatedSection delay={0.1} threshold={0.1} client:visible>
       <section>
         <h2>Career Journey</h2>
         <p>
@@ -59,7 +59,7 @@ import AnimatedSection from '../components/AnimatedSection';
       </section>
     </AnimatedSection>
 
-    <AnimatedSection delay={0.3} client:load>
+    <AnimatedSection delay={0.1} threshold={0.1} client:visible>
       <section>
         <h2>Work Experience</h2>
         <div class="space-y-6">
@@ -166,6 +166,7 @@ import AnimatedSection from '../components/AnimatedSection';
           </ul>
         </div>
       </div>
-    </section>
+      </section>
+    </AnimatedSection>
   </article>
 </Layout>

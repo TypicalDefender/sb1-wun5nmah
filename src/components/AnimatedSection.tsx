@@ -7,18 +7,38 @@ interface Props {
   children: ReactNode;
   delay?: number;
   className?: string;
+  threshold?: number;
+  triggerOnce?: boolean;
+  animateOnLoad?: boolean;
 }
 
-export default function AnimatedSection({ children, delay = 0, className = "" }: Props) {
+export default function AnimatedSection({
+  children,
+  delay = 0,
+  className = "",
+  threshold = 0.2,
+  triggerOnce = true,
+  animateOnLoad = false
+}: Props) {
   const controls = useAnimation();
   const ref = useRef(null);
-  const isInView = useInView(ref, { once: true, amount: 0.3 });
+  const isInView = useInView(ref, {
+    once: triggerOnce,
+    amount: threshold
+  });
 
   useEffect(() => {
+    // If animateOnLoad is true, animate immediately
+    if (animateOnLoad) {
+      controls.start("visible");
+      return;
+    }
+
+    // Otherwise, animate when in view
     if (isInView) {
       controls.start("visible");
     }
-  }, [controls, isInView]);
+  }, [controls, isInView, animateOnLoad]);
 
   return (
     <motion.div
