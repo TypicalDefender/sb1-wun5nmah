@@ -1,54 +1,103 @@
 ---
 import Layout from '../layouts/Layout.astro';
+import AnimatedSection from '../components/AnimatedSection';
 ---
 
-<Layout title="Your Name - Portfolio">
-  <section class="space-y-6">
-    <div class="text-center space-y-4">
-      <h1 class="text-4xl font-bold">Hi, I'm Sarthak</h1>
-      <p class="text-xl text-gray-600 dark:text-gray-400">
-        Software Engineer with a focus on Platform and Infrastructure
-      </p>
-    </div>
+<Layout title="Sarthak Dalabehera - Software Engineer">
+  <div class="min-h-screen">
+    <AnimatedSection client:load>
+      <section class="h-screen flex items-center">
+        <div class="space-y-4">
+          <p class="text-primary font-mono">Hi, my name is</p>
+          <h1 class="text-5xl md:text-7xl font-bold text-gray-900 dark:text-gray-100">
+            Sarthak Dalabehera.
+          </h1>
+          <h2 class="text-4xl md:text-6xl font-bold text-gray-600 dark:text-gray-400">
+            I build things for the web.
+          </h2>
+          <p class="max-w-xl text-gray-600 dark:text-gray-400 text-lg">
+            I'm a software engineer specializing in building exceptional digital experiences. 
+            Currently, I'm focused on building platform and infrastructure solutions at Rippling.
+          </p>
+        </div>
+      </section>
+    </AnimatedSection>
 
-    <div class="prose dark:prose-invert max-w-none">
-      <p>
-        Welcome to my corner of the web! I'm a Software Engineer interested in solving Platform and Infrastructure problems. I have extensive experience working with AWS Cloud services like S3, EC2, ECS, EKS, SNS, SQS, AWS Networking, EBS, ElastiCache, CloudWatch, RDS, and more. I am also skilled in message broker systems like Kafka, databases such as MongoDB, Postgres, and MySQL, and workflow orchestration tools like Temporal.
-      </p>
-      <p>
-        I was one of the founding contributors to Vedantu's in-house video engine powering their live classes and the sole developer responsible for building their VQuiz product backend from the ground up!
-      </p>
-      <p>
-        Proficient in TypeScript, Go, and Java, I have developed complete systems impacting millions of lives. I am always eager to learn new technologies to solve the challenges your company might be facing.
-      </p>
-    </div>
+    <AnimatedSection client:load delay={0.2}>
+      <section class="py-20" id="about">
+        <h2 class="text-2xl font-bold text-primary mb-8 font-mono">About Me</h2>
+        <div class="grid md:grid-cols-2 gap-12">
+          <div class="space-y-4 text-gray-600 dark:text-gray-400">
+            <p>
+              Hello! I'm Sarthak, and I enjoy creating things that live on the internet. 
+              My interest in software development started back in college when I decided 
+              to try customizing various open-source projects.
+            </p>
+            <p>
+              Fast-forward to today, and I've had the privilege of working at various 
+              companies, from startups to large corporations. My main focus these days 
+              is building platform and infrastructure solutions that impact millions of users.
+            </p>
+            <p>Here are a few technologies I've been working with recently:</p>
+            <ul class="grid grid-cols-2 gap-2 font-mono">
+              <li class="flex items-center">
+                <span class="text-primary mr-2">▹</span> TypeScript
+              </li>
+              <li class="flex items-center">
+                <span class="text-primary mr-2">▹</span> Go
+              </li>
+              <li class="flex items-center">
+                <span class="text-primary mr-2">▹</span> AWS
+              </li>
+              <li class="flex items-center">
+                <span class="text-primary mr-2">▹</span> Kubernetes
+              </li>
+            </ul>
+          </div>
+          <div class="relative group">
+            <div class="relative z-10">
+              <img 
+                src="https://images.pexels.com/photos/2379004/pexels-photo-2379004.jpeg" 
+                alt="Profile" 
+                class="rounded-lg grayscale hover:grayscale-0 transition-all duration-300"
+              />
+            </div>
+            <div class="absolute inset-0 border-2 border-primary rounded-lg transform translate-x-4 translate-y-4 -z-10 group-hover:translate-x-2 group-hover:translate-y-2 transition-transform duration-300"></div>
+          </div>
+        </div>
+      </section>
+    </AnimatedSection>
 
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-12">
-      <div class="p-6 border border-gray-200 dark:border-gray-700 rounded-lg">
-        <h2 class="text-2xl font-semibold mb-4">Skills</h2>
-        <ul class="space-y-2">
-          <li>AWS Cloud Services</li>
-          <li>Message Broker Systems</li>
-          <li>Database Management</li>
-          <li>Workflow Orchestration</li>
-          <li>TypeScript, Go, Java</li>
-        </ul>
-      </div>
-
-      <div class="p-6 border border-gray-200 dark:border-gray-700 rounded-lg">
-        <h2 class="text-2xl font-semibold mb-4">Featured Projects</h2>
-        <ul class="space-y-2">
-          <li>
-            <a href="https://tech.vedantu.com/works/inhouse-video-streaming/" class="text-primary hover:underline">How we built our own in-house Video Streaming Platform?</a>
-          </li>
-          <li>
-            <a href="https://www.vedantu.com/vquiz" class="text-primary hover:underline">VQuiz Product Backend</a>
-          </li>
-          <li>
-            <a href="https://github.com/TypicalDefender/entangleDB" class="text-primary hover:underline">EntangleDB</a>
-          </li>
-        </ul>
-      </div>
-    </div>
-  </section>
+    <AnimatedSection client:load delay={0.4}>
+      <section class="py-20" id="experience">
+        <h2 class="text-2xl font-bold text-primary mb-8 font-mono">Where I've Worked</h2>
+        <div class="space-y-12">
+          <div class="space-y-4">
+            <h3 class="text-xl font-bold">Senior Software Engineer @ Rippling</h3>
+            <p class="text-gray-600 dark:text-gray-400">Aug 2024 - Present</p>
+            <ul class="space-y-4">
+              <li class="flex items-start">
+                <span class="text-primary mr-2 mt-1.5">▹</span>
+                <span>Building platform for future work applications</span>
+              </li>
+              <li class="flex items-start">
+                <span class="text-primary mr-2 mt-1.5">▹</span>
+                <span>Leading Data globalization initiatives</span>
+              </li>
+              <li class="flex items-start">
+                <span class="text-primary mr-2 mt-1.5">▹</span>
+                <span>Building Dependency Tracking</span>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </section>
+    </AnimatedSection>
+  </div>
 </Layout>
+
+<style>
+  .font-mono {
+    font-family: "SF Mono", "Fira Code", "Fira Mono", monospace;
+  }
+</style>

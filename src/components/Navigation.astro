@@ -1,20 +1,21 @@
 ---
 const links = [
-  { href: '/', text: 'Home' },
-  { href: '/about', text: 'About' },
-  { href: '/blog', text: 'Blog' }
+  { href: '#about', text: 'About' },
+  { href: '#experience', text: 'Experience' },
+  { href: '/blog', text: 'Blog' },
+  { href: '#contact', text: 'Contact' }
 ];
 ---
 
 <nav>
-  <ul class="flex gap-6">
-    {links.map(link => (
+  <ul class="flex gap-6 font-mono text-sm">
+    {links.map((link, index) => (
       <li>
         <a 
           href={link.href}
-          class="text-gray-800 dark:text-gray-200 hover:text-primary dark:hover:text-primary transition-colors"
+          class="text-gray-400 hover:text-primary transition-colors duration-300"
         >
-          {link.text}
+          <span class="text-primary">0{index + 1}.</span> {link.text}
         </a>
       </li>
     ))}
