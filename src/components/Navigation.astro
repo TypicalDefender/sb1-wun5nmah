@@ -4,19 +4,54 @@ const links = [
   { href: '/about', text: 'About' },
   { href: '/blog', text: 'Blog' }
 ];
+
+const currentPath = Astro.url.pathname;
 ---
 
 <nav>
-  <ul class="flex gap-6">
-    {links.map(link => (
-      <li>
-        <a 
-          href={link.href}
-          class="text-gray-800 dark:text-gray-200 hover:text-primary dark:hover:text-primary transition-colors"
-        >
-          {link.text}
-        </a>
-      </li>
-    ))}
-  </ul>
+  <div class="flex items-center">
+    <a href="/" class="text-2xl font-bold text-primary mr-8 hover:scale-105 transition-transform">SD</a>
+    <ul class="flex gap-6">
+      {links.map((link, index) => {
+        const isActive = currentPath === link.href ||
+                        (link.href !== '/' && currentPath.startsWith(link.href));
+
+        return (
+          <li style={`animation-delay: ${index * 100}ms`} class="animate-fadeIn">
+            <a
+              href={link.href}
+              class={`relative font-medium py-1 px-1 ${
+                isActive
+                  ? 'text-primary dark:text-primary'
+                  : 'text-gray-800 dark:text-gray-200 hover:text-primary dark:hover:text-primary'
+              } transition-colors`}
+            >
+              {link.text}
+              {isActive && (
+                <span class="absolute bottom-0 left-0 w-full h-0.5 bg-primary rounded-full"></span>
+              )}
+            </a>
+          </li>
+        )
+      })}
+    </ul>
+  </div>
 </nav>
+
+<style>
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(-10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .animate-fadeIn {
+    animation: fadeIn 0.5s ease-out forwards;
+    opacity: 0;
+  }
+</style>

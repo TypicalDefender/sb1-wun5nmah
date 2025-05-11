@@ -1,17 +1,25 @@
 ---
 import Layout from '../layouts/Layout.astro';
+import AnimatedHero from '../components/AnimatedHero';
+import AnimatedSection from '../components/AnimatedSection';
+import AnimatedCard from '../components/AnimatedCard';
+import SkillBar from '../components/SkillBar';
+import FloatingContact from '../components/FloatingContact';
+import BackgroundAnimation from '../components/BackgroundAnimation';
 ---
 
-<Layout title="Your Name - Portfolio">
-  <section class="space-y-6">
-    <div class="text-center space-y-4">
-      <h1 class="text-4xl font-bold">Hi, I'm Sarthak</h1>
-      <p class="text-xl text-gray-600 dark:text-gray-400">
-        Software Engineer with a focus on Platform and Infrastructure
-      </p>
-    </div>
+<Layout title="Sarthak Dalabehera - Portfolio">
+  <BackgroundAnimation client:load />
 
+  <AnimatedHero
+    title="Hi, I'm Sarthak"
+    subtitle="Software Engineer with a focus on Platform and Infrastructure"
+    client:load
+  />
+
+  <AnimatedSection delay={0.2} className="mt-16" client:load>
     <div class="prose dark:prose-invert max-w-none">
+      <h2 id="about" class="text-3xl font-bold mb-6">About Me</h2>
       <p>
         Welcome to my corner of the web! I'm a Software Engineer interested in solving Platform and Infrastructure problems. I have extensive experience working with AWS Cloud services like S3, EC2, ECS, EKS, SNS, SQS, AWS Networking, EBS, ElastiCache, CloudWatch, RDS, and more. I am also skilled in message broker systems like Kafka, databases such as MongoDB, Postgres, and MySQL, and workflow orchestration tools like Temporal.
       </p>
@@ -22,33 +30,50 @@ import Layout from '../layouts/Layout.astro';
         Proficient in TypeScript, Go, and Java, I have developed complete systems impacting millions of lives. I am always eager to learn new technologies to solve the challenges your company might be facing.
       </p>
     </div>
+  </AnimatedSection>
 
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-12">
-      <div class="p-6 border border-gray-200 dark:border-gray-700 rounded-lg">
-        <h2 class="text-2xl font-semibold mb-4">Skills</h2>
-        <ul class="space-y-2">
-          <li>AWS Cloud Services</li>
-          <li>Message Broker Systems</li>
-          <li>Database Management</li>
-          <li>Workflow Orchestration</li>
-          <li>TypeScript, Go, Java</li>
-        </ul>
+  <AnimatedSection delay={0.3} className="mt-16" client:load>
+    <h2 class="text-3xl font-bold mb-8">My Skills</h2>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+      <div>
+        <SkillBar skill="AWS Cloud Services" percentage={95} delay={0.1} client:load />
+        <SkillBar skill="TypeScript" percentage={90} delay={0.2} client:load />
+        <SkillBar skill="Go" percentage={85} delay={0.3} client:load />
       </div>
-
-      <div class="p-6 border border-gray-200 dark:border-gray-700 rounded-lg">
-        <h2 class="text-2xl font-semibold mb-4">Featured Projects</h2>
-        <ul class="space-y-2">
-          <li>
-            <a href="https://tech.vedantu.com/works/inhouse-video-streaming/" class="text-primary hover:underline">How we built our own in-house Video Streaming Platform?</a>
-          </li>
-          <li>
-            <a href="https://www.vedantu.com/vquiz" class="text-primary hover:underline">VQuiz Product Backend</a>
-          </li>
-          <li>
-            <a href="https://github.com/TypicalDefender/entangleDB" class="text-primary hover:underline">EntangleDB</a>
-          </li>
-        </ul>
+      <div>
+        <SkillBar skill="Message Broker Systems" percentage={88} delay={0.4} client:load />
+        <SkillBar skill="Database Management" percentage={92} delay={0.5} client:load />
+        <SkillBar skill="Workflow Orchestration" percentage={85} delay={0.6} client:load />
       </div>
     </div>
-  </section>
+  </AnimatedSection>
+
+  <AnimatedSection delay={0.4} className="mt-16" client:load>
+    <h2 class="text-3xl font-bold mb-8">Featured Projects</h2>
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <AnimatedCard
+        title="In-house Video Streaming Platform"
+        description="How we built our own video streaming platform at Vedantu"
+        link="https://tech.vedantu.com/works/inhouse-video-streaming/"
+        delay={0.1}
+        client:load
+      />
+      <AnimatedCard
+        title="VQuiz Product Backend"
+        description="Built the backend for Vedantu's quiz platform from scratch"
+        link="https://www.vedantu.com/vquiz"
+        delay={0.2}
+        client:load
+      />
+      <AnimatedCard
+        title="EntangleDB"
+        description="An open-source database project"
+        link="https://github.com/TypicalDefender/entangleDB"
+        delay={0.3}
+        client:load
+      />
+    </div>
+  </AnimatedSection>
+
+  <FloatingContact client:load />
 </Layout>
